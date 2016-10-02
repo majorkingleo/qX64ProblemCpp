@@ -27,33 +27,46 @@ public:
 	void write( const Board & board );
 };
 
+class ReadBoardBase
+{
+public:
+	virtual ~ReadBoardBase() {}
 
-class ReadBoard
+	virtual bool operator!() const = 0;
+
+	virtual Board* read_next() = 0;
+
+	bool valid() const {
+		return !operator!();
+	}
+};
+
+class ReadBoard : public ReadBoardBase
 {
 	std::ifstream in;
 
 public:
 	ReadBoard( const std::string & file );
 
-	bool operator!() {
+	virtual bool operator!() const {
 		return !in;
 	}
 
-	Board* read_next();
+	virtual Board* read_next();
 };
 
-class ReadBoardText
+class ReadBoardText : public ReadBoardBase
 {
 	std::ifstream in;
 
 public:
 	ReadBoardText( const std::string & file );
 
-	bool operator!() {
+	virtual bool operator!() const {
 		return !in;
 	}
 
-	Board* read_next();
+	virtual Board* read_next();
 };
 
 

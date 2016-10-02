@@ -62,6 +62,18 @@ int main( int argc, char **argv )
 	o_size.setRequired(false);
 	arg.addOptionR( &o_size );
 
+	Arg::OptionChain oc_test;
+	arg.addChainR( &oc_test );
+	oc_test.setMinMatch( 1 );
+	oc_test.setContinueOnMatch( false );
+	oc_test.setContinueOnFail( true );
+
+	Arg::StringOption o_test_file("test-file");
+	o_test_file.setDescription("test input file. File ending .bin for binary .txt for ascii file format" );
+	o_test_file.setRequired(false);
+	o_test_file.setMinValues(1);
+	oc_test.addOptionR( &o_test_file );
+
 	try {
 
 		unsigned int BOARD_SIZE = 8;
@@ -73,6 +85,7 @@ int main( int argc, char **argv )
 				std::cout << format("%s version %s\n", argv[0], VERSION);
 				return 0;
 			} else {
+				std::cout << "invalid arguments\n";
 				usage(argv[0]);
 				std::cout << arg.getHelp(5,20,30, console_width ) << std::endl;
 				return 1;
@@ -102,6 +115,40 @@ int main( int argc, char **argv )
 				std::cout << arg.getHelp(5,20,30, console_width ) << std::endl;
 				return 1;
 			}
+		}
+
+		if( o_test_file.isSet() )
+		{
+			std::string file =  o_test_file.getValues()->at(0);
+
+			ReadBoardBase* read_board =  0;
+
+			if( toupper( file ).rfind("txt") != std::string::npos )
+			{
+				read_board = new ReadBoardText( file );
+
+				if( !read_board->valid() )
+				{
+					delete read_board;
+					throw REPORT_EXCEPTION( format("cannot read ASCII like file format of file %s", file ) );
+				}
+			}
+			else
+			{
+				read_board = new ReadBoard( file );
+
+				if( !read_board->valid() )
+				{
+					delete read_board;
+					throw REPORT_EXCEPTION( format("cannot read binary like file format of file %s", file ) );
+				}
+			}
+
+			while( Board *board = read_board->read_next() )
+			{
+				std::cout << board->toString() << "\n valid: " << x2s( board->verify() ) << '\n';
+			}
+
 		}
 
 /*
@@ -149,7 +196,7 @@ int main( int argc, char **argv )
 
 		delete board;
 */
-
+/*
 		ReadBoardText read_board( "text.txt");
 
 		if( !read_board ) {
@@ -161,7 +208,7 @@ int main( int argc, char **argv )
 		std::cout << board->toString() << std::endl;
 
 		delete board;
-
+*/
 		/*
 		Engine engine(BOARD_SIZE);
 		engine.run();
