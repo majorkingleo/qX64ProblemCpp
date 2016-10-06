@@ -15,6 +15,7 @@
 #include <cpp_util.h>
 #include "Engine.h"
 #include "writeBoard.h"
+#include "colored_output.h"
 
 using namespace Tools;
 
@@ -56,6 +57,11 @@ int main( int argc, char **argv )
 	o_debug.setRequired(false);
 	arg.addOptionR( &o_debug );
 
+	Arg::FlagOption o_all("a");
+	o_all.addName( "all" );
+	o_all.setDescription("Print valid and invalid positions. By default only valid position will be displayed.");
+	o_all.setRequired(false);
+	arg.addOptionR( &o_all );
 
 	Arg::IntOption o_size("size");
 	o_size.setDescription(format("board size (default is 8, min is 1 max is %d)", Board::max_size() ));
@@ -65,11 +71,11 @@ int main( int argc, char **argv )
 	Arg::OptionChain oc_test;
 	arg.addChainR( &oc_test );
 	oc_test.setMinMatch( 1 );
-	oc_test.setContinueOnMatch( false );
+	oc_test.setContinueOnMatch( true );
 	oc_test.setContinueOnFail( true );
 
 	Arg::StringOption o_test_file("test-file");
-	o_test_file.setDescription("test input file. File ending .bin for binary .txt for ascii file format" );
+	o_test_file.setDescription(" file1.txt file2.bin ... test input file. File ending .bin for binary .txt for ascii file format" );
 	o_test_file.setRequired(false);
 	o_test_file.setMinValues(1);
 	oc_test.addOptionR( &o_test_file );
@@ -123,7 +129,7 @@ int main( int argc, char **argv )
 
 			ReadBoardBase* read_board =  0;
 
-			if( toupper( file ).rfind("txt") != std::string::npos )
+			if( tolower( file ).rfind("txt") != std::string::npos )
 			{
 				read_board = new ReadBoardText( file );
 
@@ -146,9 +152,11 @@ int main( int argc, char **argv )
 
 			while( Board *board = read_board->read_next() )
 			{
-				std::cout << board->toString() << "\n valid: " << x2s( board->verify() ) << '\n';
+				std::cout << board->toString() << "\n valid: " << x2s( board->verify() ) << "\n\n";
+				delete board;
 			}
 
+			return 0;
 		}
 
 /*
@@ -209,12 +217,17 @@ int main( int argc, char **argv )
 
 		delete board;
 */
-		/*
-		Engine engine(BOARD_SIZE);
+
+		Engine engine(BOARD_SIZE, o_all.isSet() );
 		engine.run();
-		 */
+
 	} catch( std::exception & err ) {
-		std::cerr << "Error: " << err.what() << std::endl;
+
+		ColoredOutput color;
+
+		std::cerr << color.color_output(ColoredOutput::BRIGHT_RED, "Error: ")
+				  << color.color_output(ColoredOutput::YELLOW,err.what())
+		<< std::endl;
 		usage(argv[0]);
 		std::cout << arg.getHelp(5,20,30, console_width ) << std::endl;
 		return 1;

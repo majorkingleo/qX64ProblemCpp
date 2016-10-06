@@ -34,7 +34,7 @@ if [ -z "$CXX" ] && g++ -v > /dev/null 2>&1 ; then
 	if [ "$NOOPT" = 1 ] ; then
 		CXXFLAGS="$CXXFLAGS"
 	else
-		CXXFLAGS="$CXXFLAGS -O3 -Wall -Woverloaded-virtual -Wshadow"
+		CXXFLAGS="$CXXFLAGS -O3 -Wall -Woverloaded-virtual -Wshadow -march=native -mtune=native "
 	fi
 fi	
 

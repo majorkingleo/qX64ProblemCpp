@@ -48,6 +48,14 @@ Board* ReadBoard::read_next()
 	in.read( (char*)&size, sizeof(size));
 	in.read( (char*)&allow_null_rows, sizeof(allow_null_rows));
 
+	if( size > Board::max_size() ) {
+		throw REPORT_EXCEPTION( format( "size of board %d bigger than maximum board size of %d", size, Board::max_size() ));
+	}
+
+	if( size < 2 ) {
+		throw REPORT_EXCEPTION( "minimal board size is 2" );
+	}
+
 	Board::ROW_TYPE *b = new Board::ROW_TYPE[size];
 
 	in.read((char*)b,sizeof(Board::ROW_TYPE) * size);
@@ -69,16 +77,37 @@ Board* ReadBoardText::read_next()
 {
 	std::string ss;
 
-	getline( in, ss );
+	do {
+
+		if( in.eof() ) {
+			return 0;
+		}
+
+		getline( in, ss );
+
+		ss = strip(ss);
+
+	} while( ss.empty() );
+
 
 	std::vector<std::string> sl = split_simple( ss, " \t" );
 
 	if( sl.size() != 4 )
 	{
-		throw REPORT_EXCEPTION( format( "invalid header in ASCII format: '%s' splitted size is %d", ss, sl.size()) );
+		throw REPORT_EXCEPTION( format( "%s invalid header in ASCII format: '%s' splitted size is %d",
+				ss, sl.size()) );
 	}
 
-	unsigned int size = s2x<unsigned int>(sl[1]);
+	unsigned int size = s2x<unsigned int>(sl[1],0);
+
+	if( size > Board::max_size() ) {
+		throw REPORT_EXCEPTION( format( "size of board %d bigger than maximum board size of %d", size, Board::max_size() ));
+	}
+
+	if( size < 2 ) {
+		throw REPORT_EXCEPTION( "minimal board size is 2" );
+	}
+
 	bool allow_null_rows = s2bool(sl[3]);
 
 	getline( in, ss ); // header
@@ -93,10 +122,10 @@ Board* ReadBoardText::read_next()
 
 		if( pos == std::string::npos )
 		{
-			throw REPORT_EXCEPTION( format( "cannot parse board at line %d line: %s", line, ss ));
+			throw REPORT_EXCEPTION( format( "cannot parse board at line %d line: '%s'", line, ss ));
 		}
 
-		std::string l = strip(ss.substr(pos+1));
+		std::string l = ss.substr(pos+1);
 
 		if( l.size() != size )
 		{
@@ -104,7 +133,7 @@ Board* ReadBoardText::read_next()
 					line, ss, l.size(), size ));
 		}
 
-		for( unsigned j = 0; j < l.size(); j++ )
+		for( unsigned j = 0; j < l.size() && j < size; j++ )
 		{
 			if( l[j] == 'Q' )
 			{

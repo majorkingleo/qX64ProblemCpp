@@ -11,8 +11,9 @@
 
 using namespace Tools;
 
-Engine::Engine( unsigned int size )
-: SIZE( size )
+Engine::Engine( unsigned int size, bool print_all_ )
+: SIZE( size ),
+  print_all( print_all_ )
 {
 
 }
@@ -26,7 +27,12 @@ void Engine::print_board( std::vector<Queen> & queens )
 		board.set_queen( queens[q] );
 	}
 
-	std::cout << board.toString() << "Status: " << ( board.verify() ? "Ok" : "false" ) << std::endl;
+	print_board( board );
+}
+
+void Engine::print_board( Board & board )
+{
+	std::cout << board.toString() << "\n valid: " << x2s( board.verify() ) << "\n\n";
 }
 
 void Engine::gen_next_board()
@@ -52,13 +58,8 @@ void Engine::gen_next_board()
 
 	int count_valid = 0;
 
-	while( queens[SIZE-1].row < SIZE )
+	while( queens[SIZE-1].row <= SIZE )
 	{
-		queens[0].inc_row( SIZE );
-
-		// print_board( queens );
-		count++;
-
 		Board board(SIZE,false);
 
 		for( unsigned q = 0; q < queens.size(); q++ )
@@ -66,11 +67,19 @@ void Engine::gen_next_board()
 			board.set_queen( queens[q] );
 		}
 
-		print_board( queens );
-
 		if( board.verify() )
 		{
 			count_valid++;
+			print_board( board );
+		}
+		else if( print_all )
+		{
+			print_board( board );
+		}
+
+		count++;
+		if( queens[0].inc_row( SIZE ) ) {
+			break;
 		}
 	}
 

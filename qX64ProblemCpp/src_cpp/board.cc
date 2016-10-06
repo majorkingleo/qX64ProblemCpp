@@ -166,6 +166,8 @@ void Board::set_queen( unsigned col, unsigned row )
 
 bool Board::verify()
 {
+	create_if_not_exists();
+
 	ROW_TYPE mask_start = 1;
 	mask_start <<= MAX_SIZE -1;
 
@@ -203,10 +205,12 @@ bool Board::verify()
 
 		for( mask = mask_start; mask > 0 && shift_count < SIZE; mask >>= 1, shift_count++ )
 		{
-			DEBUG( format("i: %d shift_count: %d mask: %s", i, shift_count, Row2String(mask,false)) );
+			DEBUG( format("i: %d shift_count: %d mask: %s", i, shift_count, Row2String(mask)) );
 
-			if( board[i] & mask )
+			if( (board[i] & mask) == board[i])
 			{
+				DEBUG( format( "Board: %s matches mask %s",  Row2String(board[i]),  Row2String(mask)))
+
 				valid_mask_found = true;
 
 				queens_masks_by_row[i] = mask;

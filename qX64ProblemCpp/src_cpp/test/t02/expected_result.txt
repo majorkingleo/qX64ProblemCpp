@@ -1,0 +1,6 @@
+Board: 2 allow_null_rows: TRUE
+  AB
+2 QQ
+1 #_
+
+ valid: FALSE

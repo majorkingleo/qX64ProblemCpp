@@ -1,0 +1,40 @@
+Board: 2	allow_null_rows: true
+  AB
+1 #Q
+2 _#
+
+Board: 2	allow_null_rows: true
+  AB
+1 QQ
+2 _#
+
+Board: 2	allow_null_rows: true
+  AB
+1 #Q
+2 Q#
+
+Board: 2	allow_null_rows: true
+  AB
+1 #Q
+2 _Q
+
+Board: 2	allow_null_rows: true
+  AB
+1 #_
+2 _#
+
+Board: 2	allow_null_rows: true
+  AB
+1 QQ
+2 Q#
+
+Board: 2	allow_null_rows: true
+  AB
+1 #_
+2 Q#
+
+Board: 2	allow_null_rows: true
+  AB
+1 QQ
+2 QQ
+

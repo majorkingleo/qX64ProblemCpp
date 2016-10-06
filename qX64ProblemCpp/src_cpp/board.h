@@ -29,7 +29,10 @@ public:
 		next_queen = next;
 	}
 
-	void inc_row( const unsigned SIZE )
+	/*
+	 * return true if end is reached
+	 */
+	bool inc_row( const unsigned SIZE )
 	{
 		row++;
 		if( row > SIZE )
@@ -37,9 +40,12 @@ public:
 			row = 1;
 			if( next_queen )
 			{
-				next_queen->inc_row( SIZE );
+				return next_queen->inc_row( SIZE );
+			} else {
+				return true;
 			}
 		}
+		return false;
 	}
 };
 
@@ -81,7 +87,7 @@ public:
 
 	std::string toString();
 
-	std::string Row2String( ROW_TYPE row, bool even );
+	std::string Row2String( ROW_TYPE row, bool even = false );
 
 	static unsigned long max_size();
 
