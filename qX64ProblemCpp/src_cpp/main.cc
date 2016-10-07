@@ -16,6 +16,7 @@
 #include "Engine.h"
 #include "writeBoard.h"
 #include "colored_output.h"
+#include "OpenMPEngine.h"
 
 using namespace Tools;
 
@@ -64,7 +65,7 @@ int main( int argc, char **argv )
 	arg.addOptionR( &o_all );
 
 	Arg::IntOption o_size("size");
-	o_size.setDescription(format("board size (default is 8, min is 1 max is %d)", Board::max_size() ));
+	o_size.setDescription(format("board size (default is 8, min is 1 max is %d)", Board::MAX_SIZE ));
 	o_size.setRequired(false);
 	arg.addOptionR( &o_size );
 
@@ -79,6 +80,11 @@ int main( int argc, char **argv )
 	o_test_file.setRequired(false);
 	o_test_file.setMinValues(1);
 	oc_test.addOptionR( &o_test_file );
+
+	Arg::FlagOption o_openmp("openmp");
+	o_openmp.setDescription("Use openMP");
+	o_openmp.setRequired(false);
+	arg.addOptionR( &o_openmp );
 
 	try {
 
@@ -114,7 +120,7 @@ int main( int argc, char **argv )
 		{
 			BOARD_SIZE = s2x<int>(o_size.getValues()->at(0),8);
 
-			if( BOARD_SIZE < 1 || BOARD_SIZE > Board::max_size() )
+			if( BOARD_SIZE < 1 || BOARD_SIZE > Board::MAX_SIZE )
 			{
 				throw REPORT_EXCEPTION( format( "invalid board size %d",BOARD_SIZE ) ) ;
 				usage(argv[0]);
@@ -217,9 +223,16 @@ int main( int argc, char **argv )
 
 		delete board;
 */
+		Engine *engine = 0;
 
-		Engine engine(BOARD_SIZE, o_all.isSet() );
-		engine.run();
+		if( o_openmp.isSet() )
+		{
+			engine = new OpenMPEngine( BOARD_SIZE, o_all.isSet() );
+		} else {
+			engine = new Engine( BOARD_SIZE, o_all.isSet() );
+		}
+
+		engine->run();
 
 	} catch( std::exception & err ) {
 

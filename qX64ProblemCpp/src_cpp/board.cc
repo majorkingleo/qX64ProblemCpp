@@ -11,9 +11,10 @@
 
 using namespace Tools;
 
+const unsigned int Board::MAX_SIZE = Board::max_size();
+
 Board::Board( const Board & other )
 : SIZE( other.SIZE ),
-  MAX_SIZE(max_size()),
   allow_null_rows(other.allow_null_rows),
   board(0)
 {
@@ -27,21 +28,19 @@ Board::Board( const Board & other )
 
 Board & Board::operator=( const Board & other )
 {
-	if( SIZE != other.SIZE ) {
-		throw REPORT_EXCEPTION( "invalid assignment");
-	}
-
-	if( allow_null_rows != other.allow_null_rows ) {
-		throw REPORT_EXCEPTION( "invalid assignment");
-	}
+	SIZE = other.SIZE;
+	allow_null_rows = other.allow_null_rows;
 
 	clear();
 
-	board = new ROW_TYPE[SIZE];
-
-	for( unsigned i = 0; i < SIZE; i++ )
+	if( other.board )
 	{
-		board[i] = other.board[i];
+		board = new ROW_TYPE[SIZE];
+
+		for( unsigned i = 0; i < SIZE; i++ )
+		{
+			board[i] = other.board[i];
+		}
 	}
 
 	return *this;
@@ -49,9 +48,9 @@ Board & Board::operator=( const Board & other )
 
 void Board::create()
 {
-	if( SIZE > max_size() )
+	if( SIZE > MAX_SIZE )
 	{
-		throw REPORT_EXCEPTION( format( "SIZE %s > max board size of %d", SIZE, max_size() ));
+		throw REPORT_EXCEPTION( format( "SIZE %s > max board size of %d", SIZE, MAX_SIZE ));
 	}
 
 	board = new ROW_TYPE[SIZE];
@@ -136,9 +135,8 @@ void Board::clear()
 
 void Board::reset()
 {
-	for( unsigned i = 0; i < SIZE; i++ )
-	{
-		board[i] = 0;
+	if( board ) {
+		memset(board,0,sizeof(ROW_TYPE)*SIZE);
 	}
 }
 
@@ -154,12 +152,15 @@ void Board::set_queen( unsigned col, unsigned row )
 		throw REPORT_EXCEPTION( format( "invalid row %d max SIZE %d", row, SIZE));
 	}
 
+	set_queen_fast( col, row );
+}
+
+void Board::set_queen_fast( unsigned col, unsigned row )
+{
 	ROW_TYPE & board_row = board[row-1];
 
 	ROW_TYPE mask = 1;
 	mask <<= MAX_SIZE - col;
-
-	// std::cout << Row2String( mask, true ) << std::endl;
 
 	board_row |= mask;
 }
@@ -172,16 +173,10 @@ bool Board::verify()
 	mask_start <<= MAX_SIZE -1;
 
 	short queens_by_col[SIZE];
-
-	for( unsigned i = 0; i < SIZE; i++ ) {
-		queens_by_col[i] = 0;
-	}
+	memset(&queens_by_col, 0, sizeof(queens_by_col));
 
 	ROW_TYPE queens_masks_by_row[SIZE];
-
-	for( unsigned i = 0; i < SIZE; i++ ) {
-		queens_masks_by_row[i] = 0;
-	}
+	memset(&queens_masks_by_row, 0, sizeof(queens_masks_by_row));
 
 	// one quen by row verification
 	for( int i = SIZE-1; i >= 0; i-- )
@@ -197,7 +192,10 @@ bool Board::verify()
 				return false;
 			}
 		}
+	}
 
+	for( int i = SIZE-1; i >= 0; i-- )
+	{
 		bool valid_mask_found = false;
 
 		ROW_TYPE mask = 1;

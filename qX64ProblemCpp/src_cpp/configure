@@ -9,7 +9,7 @@ if [ `uname` = Linux ] ; then
 	export CXXFLAGS="${CXXFLAGS} -fstack-protector "
 fi
 
-export CXXFLAGS="${CXXFLAGS} -pthread "
+export CXXFLAGS="${CXXFLAGS} -pthread -fopenmp "
 
 if [ $# -gt 0 ] ; then
   if [ $1 = "-g" ] ; then

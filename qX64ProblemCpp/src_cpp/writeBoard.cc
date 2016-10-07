@@ -48,8 +48,8 @@ Board* ReadBoard::read_next()
 	in.read( (char*)&size, sizeof(size));
 	in.read( (char*)&allow_null_rows, sizeof(allow_null_rows));
 
-	if( size > Board::max_size() ) {
-		throw REPORT_EXCEPTION( format( "size of board %d bigger than maximum board size of %d", size, Board::max_size() ));
+	if( size > Board::MAX_SIZE ) {
+		throw REPORT_EXCEPTION( format( "size of board %d bigger than maximum board size of %d", size, Board::MAX_SIZE ));
 	}
 
 	if( size < 2 ) {
@@ -100,8 +100,8 @@ Board* ReadBoardText::read_next()
 
 	unsigned int size = s2x<unsigned int>(sl[1],0);
 
-	if( size > Board::max_size() ) {
-		throw REPORT_EXCEPTION( format( "size of board %d bigger than maximum board size of %d", size, Board::max_size() ));
+	if( size > Board::MAX_SIZE ) {
+		throw REPORT_EXCEPTION( format( "size of board %d bigger than maximum board size of %d", size, Board::MAX_SIZE ));
 	}
 
 	if( size < 2 ) {

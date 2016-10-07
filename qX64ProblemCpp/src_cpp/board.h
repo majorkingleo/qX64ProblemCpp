@@ -56,18 +56,17 @@ public:
 
 	typedef unsigned long ROW_TYPE;
 
-	const unsigned int SIZE;
-	const unsigned int MAX_SIZE;
-	const bool allow_null_rows;
+	unsigned int SIZE;
+	static const unsigned int MAX_SIZE;
+	bool allow_null_rows;
 
 protected:
 
 	ROW_TYPE *board;
 
 public:
-	Board( const unsigned int size, bool allow_null_rows_ = false )
+	Board( const unsigned int size = 0, bool allow_null_rows_ = false )
 	: SIZE( size ),
-	  MAX_SIZE(max_size()),
 	  allow_null_rows(allow_null_rows_),
 	  board(0)
 	{}
@@ -95,6 +94,11 @@ public:
 
 	void set_queen( unsigned col, unsigned row );
 
+	/**
+	 * no bounce queck
+	 */
+	void set_queen_fast( unsigned col, unsigned row );
+
 	void set_queen( char col, unsigned row )
 	{
 		set_queen(  (unsigned)(col - 'A' + 1), row );
@@ -103,6 +107,16 @@ public:
 	void set_queen( const Queen & queen )
 	{
 		set_queen( queen.col, queen.row );
+	}
+
+	void set_queen_fast( char col, unsigned row )
+	{
+		set_queen_fast(  (unsigned)(col - 'A' + 1), row );
+	}
+
+	void set_queen_fast( const Queen & queen )
+	{
+		set_queen_fast( queen.col, queen.row );
 	}
 
 	virtual bool verify();

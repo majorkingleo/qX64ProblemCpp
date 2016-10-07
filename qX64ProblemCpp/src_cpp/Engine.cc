@@ -58,23 +58,27 @@ void Engine::gen_next_board()
 
 	int count_valid = 0;
 
+	Board *board = 0;
+	board = new Board(SIZE,false);
+	board->create();
+
 	while( queens[SIZE-1].row <= SIZE )
 	{
-		Board board(SIZE,false);
+		board->reset();
 
 		for( unsigned q = 0; q < queens.size(); q++ )
 		{
-			board.set_queen( queens[q] );
+			board->set_queen_fast( queens[q] );
 		}
 
-		if( board.verify() )
+		if( board->verify() )
 		{
 			count_valid++;
-			print_board( board );
+			print_board( *board );
 		}
 		else if( print_all )
 		{
-			print_board( board );
+			print_board( *board );
 		}
 
 		count++;
